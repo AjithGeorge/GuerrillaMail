@@ -1,0 +1,226 @@
+{
+	"info": {
+		"_postman_id": "35ab34b9-419c-4127-a1eb-7e69827c0207",
+		"name": "GuerrillaMail",
+		"description": "### **Introduction**\n\n**Guerrilla Mail provides a JSON API through HTTP. The API is public and open to all, it does not need registration or API keys to operate. The API is used by GuerrillaMail itself to power the site, so GuerrillaMail.com is actually an example for how to use the API.**\n\n**The API URL is located at:** [<b>https://api.guerrillamail.com/ajax.php</b>](https://api.guerrillamail.com/ajax.php)\n\n**Each request to the above URL must have a parameter ‘f’, indicating the function name. It may optionally pass ‘ip’ and ‘agent’ to indicate the IP address and user-agent of the client-end. Followed by the argument(s) as required by the function specification. The result will be returned in a JSON encoded string.** \n\n**Example:  https://api.guerrillamail.com/ajax.php?f=get_email_address&ip=127.0.0.1&agent=Mozilla_foo_bar**\n\n**As a requirement, the client interacting with the API must be able to save, send and receive the following parameters**\n\n**sid_token - A session ID. Set by the server for to maintain state. The client must always look for this parameter with each function return, remember it (if changed), and then provide it as a parameter with each API call. This value can change at every call, and when it changes, it indicates that a new session was started; the client would need to refresh the interface with new data.**\n\n**Note: The API may be rate limited, but we do not publish our rate limits. Please use this API carefully.**",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29683045"
+	},
+	"item": [
+		{
+			"name": "get_email_address",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Email Address: Retrieve Session Id\", function () {\r",
+							"    pm.globals.set('sid',pm.response.json().sid_token)\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}?f=get_email_address&site=guerrillamail.com",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"query": [
+						{
+							"key": "f",
+							"value": "get_email_address"
+						},
+						{
+							"key": "site",
+							"value": "guerrillamail.com"
+						}
+					]
+				},
+				"description": "**User accesses the Guerrilla Mail Application. App initializes and calls get_email_address to get the session id (sid_token), email address and email address’ timestamp. The client can get a random email address, or specify the local part of an address that they wish to use.**\n\n**Note: A session can expire after about 18 minutes of inactivity. If a session expires, a new email address will be generated when making a call to get_email_address , a user can always return to the old email address by making a call to set_email_user**"
+			},
+			"response": []
+		},
+		{
+			"name": "set_email_user",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}?f=set_email_user&email_user=wow&site=guerrillamail.com&sid_token={{sid}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"query": [
+						{
+							"key": "f",
+							"value": "set_email_user"
+						},
+						{
+							"key": "email_user",
+							"value": "wow"
+						},
+						{
+							"key": "site",
+							"value": "guerrillamail.com"
+						},
+						{
+							"key": "sid_token",
+							"value": "{{sid}}"
+						}
+					]
+				},
+				"description": "**To change the email address - the user can set the email address.  (A call to set_email_user is made). After making a call to this function, the client can fetch the email list for this email by checking the email. Note: When a user changes the email address from one address to another, the old email address and its emails are NOT deleted, if the user changes back to the old address then their messages will still be there until the address expires or the message is 1 hour old.**"
+			},
+			"response": []
+		},
+		{
+			"name": "check_mail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}?f=check_email&seq=0&sid_token={{sid}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"query": [
+						{
+							"key": "f",
+							"value": "check_email"
+						},
+						{
+							"key": "seq",
+							"value": "0"
+						},
+						{
+							"key": "sid_token",
+							"value": "{{sid}}"
+						}
+					]
+				},
+				"description": "**A call to check_email is made, to check for new email.**"
+			},
+			"response": []
+		},
+		{
+			"name": "get_email_list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}?f=get_email_list&sid_token={{sid}}&offset=0",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"query": [
+						{
+							"key": "f",
+							"value": "get_email_list"
+						},
+						{
+							"key": "sid_token",
+							"value": "{{sid}}"
+						},
+						{
+							"key": "offset",
+							"value": "0"
+						}
+					]
+				},
+				"description": "**Call to get_email_list (with offset=0) to get the initial page of emails of up to 20 emails. Note that this function needs to be called only when opening the mailbox for the first time as part of initialization, it should not be used for checking email**"
+			},
+			"response": []
+		},
+		{
+			"name": "fetch_email",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}?f=fetch_email&sid_token={{sid}}&email_id=1",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"query": [
+						{
+							"key": "f",
+							"value": "fetch_email"
+						},
+						{
+							"key": "sid_token",
+							"value": "{{sid}}"
+						},
+						{
+							"key": "email_id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "forget_mail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}?f=forget_me&sid_token={{sid}}&email_addr={{alias}}@guerrillamailblock.com",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"query": [
+						{
+							"key": "f",
+							"value": "forget_me"
+						},
+						{
+							"key": "sid_token",
+							"value": "{{sid}}"
+						},
+						{
+							"key": "email_addr",
+							"value": "{{alias}}@guerrillamailblock.com"
+						}
+					]
+				},
+				"description": "**Forget email - tell the server to forget the current email address (but do not delete it)**"
+			},
+			"response": []
+		},
+		{
+			"name": "delete_mail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}?f=del_email&sid_token={{sid}}&email_ids[]=150884680",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"query": [
+						{
+							"key": "f",
+							"value": "del_email"
+						},
+						{
+							"key": "sid_token",
+							"value": "{{sid}}"
+						},
+						{
+							"key": "email_ids[]",
+							"value": "150884680"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
